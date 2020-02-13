@@ -1,0 +1,33 @@
+version: '3'
+services:
+    web_social:
+        image: nginx:latest
+        volumes:
+            - ./.docker/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./src:/var/www/html
+        ports:
+            - 80:80
+        restart: always
+        depends_on:
+            - php_social
+            - db_social
+    php_social:
+        build: .docker
+        restart: always
+        volumes:
+            - ./.docker/conf/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+            - ./src:/var/www/html
+        
+    composer_social:
+        image: composer
+        volumes:
+            - ./src:/app
+        command: update 
+        
+    db_social:
+      image: mariadb:10
+      environment:
+        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        - MYSQL_DATABASE=${DB_DATABASE}
+      restart: always
+
